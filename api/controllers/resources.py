@@ -3,11 +3,11 @@ from fastapi import HTTPException, status, Response, Depends
 from ..models import models, schemas
 
 
-def create(db: Session, sandwich):
+def create(db: Session, resource):
     # Create a new instance of the Order model with the provided data
-    db_order = models.Sandwich(
-        sandwich_name=sandwich.sandwich_name,
-        price = sandwich.price
+    db_order = models.Resource(
+        customer_name=resource.customer_name,
+        description=resource.description
     )
     # Add the newly created Order object to the database session
     db.add(db_order)
@@ -20,29 +20,29 @@ def create(db: Session, sandwich):
 
 
 def read_all(db: Session):
-    return db.query(models.Sandwich).all()
+    return db.query(models.Resource).all()
 
 
 def read_one(db: Session, order_id):
-    return db.query(models.Sandwich).filter(models.Sandwich.id == order_id).first()
+    return db.query(models.Resource).filter(models.Resource.id == order_id).first()
 
 
-def update(db: Session, order_id, sandwich):
-    # Query the database for the specific sandwich to update
-    db_order = db.query(models.Sandwich).filter(models.Sandwich.id == order_id)
-    # Extract the update data from the provided 'sandwich' object
-    update_data = sandwich.model_dump(exclude_unset=True)
+def update(db: Session, order_id, resource):
+    # Query the database for the specific resource to update
+    db_order = db.query(models.Resource).filter(models.Resource.id == order_id)
+    # Extract the update data from the provided 'resource' object
+    update_data = resource.model_dump(exclude_unset=True)
     # Update the database record with the new data, without synchronizing the session
     db_order.update(update_data, synchronize_session=False)
     # Commit the changes to the database
     db.commit()
-    # Return the updated sandwich record
+    # Return the updated resource record
     return db_order.first()
 
 
 def delete(db: Session, order_id):
-    # Query the database for the specific sandwich to delete
-    db_order = db.query(models.Sandwich).filter(models.Sandwich.id == order_id)
+    # Query the database for the specific resource to delete
+    db_order = db.query(models.Resource).filter(models.Resource.id == order_id)
     # Delete the database record without synchronizing the session
     db_order.delete(synchronize_session=False)
     # Commit the changes to the database

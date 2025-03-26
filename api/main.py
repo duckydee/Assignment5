@@ -56,8 +56,8 @@ def delete_one_order(order_id: int, db: Session = Depends(get_db)):
 
 #Sandwich Endpoints
 @app.post("/sandwiches/", response_model=schemas.Sandwich, tags=["Sandwiches"])
-def create_order(sandwiches: schemas.OrderCreate, db: Session = Depends(get_db)):
-    return sandwiches.create(db=db, order=sandwiches)
+def create_order(sandwich: schemas.SandwichCreate, db: Session = Depends(get_db)):
+    return sandwiches.create(db=db, sandwich=sandwich)
 
 
 @app.get("/sandwiches/", response_model=list[schemas.Sandwich], tags=["Sandwiches"])
@@ -74,11 +74,11 @@ def read_one_order(order_id: int, db: Session = Depends(get_db)):
 
 
 @app.put("/sandwich/{sandwich_id}", response_model=schemas.Sandwich, tags=["Sandwiches"])
-def update_one_order(order_id: int, order: schemas.OrderUpdate, db: Session = Depends(get_db)):
+def update_one_order(order_id: int, order: schemas.SandwichUpdate, db: Session = Depends(get_db)):
     order_db = sandwiches.read_one(db, order_id=order_id)
     if order_db is None:
         raise HTTPException(status_code=404, detail="User not found")
-    return sandwiches.update(db=db, order=order, order_id=order_id)
+    return sandwiches.update(db=db, sandwich=order, order_id=order_id)
 
 
 @app.delete("/sandwich/{sandwich_id}", tags=["Sandwiches"])
