@@ -157,4 +157,39 @@ def delete_one_order(order_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="User not found")
     return recipes.delete(db=db, order_id=order_id)
 
+#Order Detail Endpoints
+#OrderDetail Endpoints
+@app.post("/order_details/", response_model=schemas.OrderDetail, tags=["Order Details"])
+def create_order(order_detail: schemas.RecipeCreate, db: Session = Depends(get_db)):
+    return recipes.create(db=db, order_detail=order_detail)
+
+
+@app.get("/order_details/", response_model=list[schemas.OrderDetail], tags=["Order Details"])
+def read_orders(db: Session = Depends(get_db)):
+    return recipes.read_all(db)
+
+
+@app.get("/order_details/{order_id}", response_model=schemas.OrderDetail, tags=["Order Details"])
+def read_one_order(order_id: int, db: Session = Depends(get_db)):
+    order = recipes.read_one(db, order_id=order_id)
+    if order is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return order
+
+
+@app.put("/order_details/{order_id}", response_model=schemas.OrderDetail, tags=["Order Details"])
+def update_one_order(order_id: int, order: schemas.RecipeUpdate, db: Session = Depends(get_db)):
+    order_db = recipes.read_one(db, order_id=order_id)
+    if order_db is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return recipes.update(db=db, order_detail=order, order_id=order_id)
+
+
+@app.delete("/order_details/{order_id}", tags=["Order Details"])
+def delete_one_order(order_id: int, db: Session = Depends(get_db)):
+    order = recipes.read_one(db, order_id=order_id)
+    if order is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return recipes.delete(db=db, order_id=order_id)
+
 
