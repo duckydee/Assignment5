@@ -6,8 +6,8 @@ from ..models import models, schemas
 def create(db: Session, resource):
     # Create a new instance of the Order model with the provided data
     db_order = models.Resource(
-        customer_name=resource.customer_name,
-        description=resource.description
+        item=resource.item,
+        amount=resource.amount
     )
     # Add the newly created Order object to the database session
     db.add(db_order)
