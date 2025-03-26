@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from fastapi.middleware.cors import CORSMiddleware
 
 from .models import models, schemas
-from .controllers import orders, sandwiches, resources
+from .controllers import orders, sandwiches, resources, recipes
 from .dependencies.database import engine, get_db
 
 models.Base.metadata.create_all(bind=engine)
@@ -19,6 +19,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 # Order Endpoints
 @app.post("/orders/", response_model=schemas.Order, tags=["Orders"])
@@ -121,3 +122,39 @@ def delete_one_order(order_id: int, db: Session = Depends(get_db)):
     if order is None:
         raise HTTPException(status_code=404, detail="User not found")
     return resources.delete(db=db, order_id=order_id)
+
+#Recipe Endpoints
+@app.post("/recipes/", response_model=schemas.Recipe, tags=["Recipes"])
+def create_order(recipe: schemas.RecipeCreate, db: Session = Depends(get_db)):
+    return recipes.create(db=db, recipe=recipe)
+
+
+@app.get("/recipes/", response_model=list[schemas.Recipe], tags=["Recipes"])
+def read_orders(db: Session = Depends(get_db)):
+    return recipes.read_all(db)
+
+
+@app.get("/recipes/{recipe_id}", response_model=schemas.Recipe, tags=["Recipes"])
+def read_one_order(order_id: int, db: Session = Depends(get_db)):
+    order = recipes.read_one(db, order_id=order_id)
+    if order is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return order
+
+
+@app.put("/recipes/{recipe_id}", response_model=schemas.Recipe, tags=["Recipes"])
+def update_one_order(order_id: int, order: schemas.RecipeUpdate, db: Session = Depends(get_db)):
+    order_db = recipes.read_one(db, order_id=order_id)
+    if order_db is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return recipes.update(db=db, recipe=order, order_id=order_id)
+
+
+@app.delete("/recipes/{recipe_id}", tags=["Recipes"])
+def delete_one_order(order_id: int, db: Session = Depends(get_db)):
+    order = recipes.read_one(db, order_id=order_id)
+    if order is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return recipes.delete(db=db, order_id=order_id)
+
+
