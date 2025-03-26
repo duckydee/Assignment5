@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from fastapi.middleware.cors import CORSMiddleware
 
 from .models import models, schemas
-from .controllers import orders
+from .controllers import orders, sandwiches
 from .dependencies.database import engine, get_db
 
 models.Base.metadata.create_all(bind=engine)
@@ -20,7 +20,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
+# Order Endpoints
 @app.post("/orders/", response_model=schemas.Order, tags=["Orders"])
 def create_order(order: schemas.OrderCreate, db: Session = Depends(get_db)):
     return orders.create(db=db, order=order)
@@ -53,3 +53,37 @@ def delete_one_order(order_id: int, db: Session = Depends(get_db)):
     if order is None:
         raise HTTPException(status_code=404, detail="User not found")
     return orders.delete(db=db, order_id=order_id)
+
+#Sandwich Endpoints
+@app.post("/sandwiches/", response_model=schemas.Sandwich, tags=["Sandwiches"])
+def create_order(sandwiches: schemas.OrderCreate, db: Session = Depends(get_db)):
+    return sandwiches.create(db=db, order=sandwiches)
+
+
+@app.get("/sandwiches/", response_model=list[schemas.Sandwich], tags=["Sandwiches"])
+def read_orders(db: Session = Depends(get_db)):
+    return sandwiches.read_all(db)
+
+
+@app.get("/sandwiches/{sandwiches_id}", response_model=schemas.Sandwich, tags=["Sandwiches"])
+def read_one_order(order_id: int, db: Session = Depends(get_db)):
+    order = sandwiches.read_one(db, order_id=order_id)
+    if order is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return order
+
+
+@app.put("/sandwich/{sandwich_id}", response_model=schemas.Sandwich, tags=["Sandwiches"])
+def update_one_order(order_id: int, order: schemas.OrderUpdate, db: Session = Depends(get_db)):
+    order_db = sandwiches.read_one(db, order_id=order_id)
+    if order_db is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return sandwiches.update(db=db, order=order, order_id=order_id)
+
+
+@app.delete("/sandwich/{sandwich_id}", tags=["Sandwiches"])
+def delete_one_order(order_id: int, db: Session = Depends(get_db)):
+    order = sandwiches.read_one(db, order_id=order_id)
+    if order is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return sandwiches.delete(db=db, order_id=order_id)
